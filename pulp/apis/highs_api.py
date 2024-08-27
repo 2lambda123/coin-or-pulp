@@ -158,7 +158,7 @@ class HiGHS_CMD(LpSolver_CMD):
         if process.returncode == -1:
             raise PulpSolverError("Error while executing HiGHS")
 
-        with open(highs_log_file, "r") as log_file:
+        with open(highs_log_file) as log_file:
             lines = log_file.readlines()
         lines = [line.strip().split() for line in lines]
 

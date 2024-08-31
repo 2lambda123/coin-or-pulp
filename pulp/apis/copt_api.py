@@ -27,10 +27,7 @@ from ..constants import LpMinimize, LpMaximize
 
 
 # COPT string convention
-if sys.version_info >= (3, 0):
-    coptstr = lambda x: bytes(x, "utf-8")
-else:
-    coptstr = lambda x: x
+coptstr = lambda x: bytes(x, "utf-8")
 
 byref = ctypes.byref
 
@@ -82,13 +79,13 @@ class COPT_CMD(LpSolver_CMD):
         GUROBI_CMD.actualSolve, with some modifications.
         """
         if not self.available():
-            raise PulpSolverError("COPT_PULP: Failed to execute '{}'".format(self.path))
+            raise PulpSolverError(f"COPT_PULP: Failed to execute '{self.path}'")
 
         if not self.keepFiles:
             uuid = uuid4().hex
-            tmpLp = os.path.join(self.tmpDir, "{}-pulp.lp".format(uuid))
-            tmpSol = os.path.join(self.tmpDir, "{}-pulp.sol".format(uuid))
-            tmpMst = os.path.join(self.tmpDir, "{}-pulp.mst".format(uuid))
+            tmpLp = os.path.join(self.tmpDir, f"{uuid}-pulp.lp")
+            tmpSol = os.path.join(self.tmpDir, f"{uuid}-pulp.sol")
+            tmpMst = os.path.join(self.tmpDir, f"{uuid}-pulp.mst")
         else:
             # Replace space with underscore to make filepath better
             tmpName = lp.name
@@ -110,11 +107,11 @@ class COPT_CMD(LpSolver_CMD):
             solvecmds += "read " + tmpMst + ";"
 
         if self.logfile is not None:
-            solvecmds += "set logfile {};".format(self.logfile)
+            solvecmds += f"set logfile {self.logfile};"
 
         if self.solverparams is not None:
             for parname, parval in self.solverparams.items():
-                solvecmds += "set {0} {1};".format(parname, parval)
+                solvecmds += f"set {parname} {parval};"
 
         if lp.isMIP() and not self.mip:
             solvecmds += "optimizelp;"
@@ -141,7 +138,7 @@ class COPT_CMD(LpSolver_CMD):
 
         # Get and analyze result
         if rc != 0:
-            raise PulpSolverError("COPT_PULP: Failed to execute '{}'".format(self.path))
+            raise PulpSolverError(f"COPT_PULP: Failed to execute '{self.path}'")
 
         if not os.path.exists(tmpSol):
             status = LpStatusNotSolved
@@ -191,7 +188,7 @@ class COPT_CMD(LpSolver_CMD):
         mstvals = [(v.name, v.value()) for v in lpvars if v.value() is not None]
         mstline = []
         for varname, varval in mstvals:
-            mstline.append("{0} {1}".format(varname, varval))
+            mstline.append(f"{varname} {varval}")
 
         with open(filename, "w") as mstfile:
             mstfile.write("\n".join(mstline))
@@ -487,9 +484,9 @@ class COPT_DLL(LpSolver):
             objconst = ctypes.c_double(0.0)
 
             # Associate each variable with a ordinal
-            self.v2n = dict(((cols[i], i) for i in range(ncol)))
-            self.vname2n = dict(((cols[i].name, i) for i in range(ncol)))
-            self.n2v = dict((i, cols[i]) for i in range(ncol))
+            self.v2n = {cols[i]: i for i in range(ncol)}
+            self.vname2n = {cols[i].name: i for i in range(ncol)}
+            self.n2v = {i: cols[i] for i in range(ncol)}
             self.c2n = {}
             self.n2c = {}
             self.addedVars = ncol
@@ -722,7 +719,7 @@ class COPT_DLL(LpSolver):
 
             if rc != 0:
                 raise PulpSolverError(
-                    "COPT_PULP: Failed to write file '{}'".format(filename)
+                    f"COPT_PULP: Failed to write file '{filename}'"
                 )
 
         def setParam(self, name, val):
@@ -735,7 +732,7 @@ class COPT_DLL(LpSolver):
             rc = self.SearchParamAttr(self.coptprob, par_name, byref(par_type))
             if rc != 0:
                 raise PulpSolverError(
-                    "COPT_PULP: Failed to check type for '{}'".format(par_name)
+                    f"COPT_PULP: Failed to check type for '{par_name}'"
                 )
 
             if par_type.value == 0:
@@ -756,7 +753,7 @@ class COPT_DLL(LpSolver):
                     )
             else:
                 raise PulpSolverError(
-                    "COPT_PULP: Invalid parameter '{}'".format(par_name)
+                    f"COPT_PULP: Invalid parameter '{par_name}'"
                 )
 
         def getParam(self, name):
@@ -771,7 +768,7 @@ class COPT_DLL(LpSolver):
             rc = self.SearchParamAttr(self.coptprob, par_name, byref(par_type))
             if rc != 0:
                 raise PulpSolverError(
-                    "COPT_PULP: Failed to check type for '{}'".format(par_name)
+                    f"COPT_PULP: Failed to check type for '{par_name}'"
                 )
 
             if par_type.value == 0:
@@ -796,7 +793,7 @@ class COPT_DLL(LpSolver):
                     retval = par_intval.value
             else:
                 raise PulpSolverError(
-                    "COPT_PULP: Invalid parameter '{}'".format(par_name)
+                    f"COPT_PULP: Invalid parameter '{par_name}'"
                 )
 
             return retval
@@ -814,7 +811,7 @@ class COPT_DLL(LpSolver):
             rc = self.SearchParamAttr(self.coptprob, attr_name, byref(attr_type))
             if rc != 0:
                 raise PulpSolverError(
-                    "COPT_PULP: Failed to check type for '{}'".format(attr_name)
+                    f"COPT_PULP: Failed to check type for '{attr_name}'"
                 )
 
             if attr_type.value == 2:
@@ -839,7 +836,7 @@ class COPT_DLL(LpSolver):
                     retval = attr_intval.value
             else:
                 raise PulpSolverError(
-                    "COPT_PULP: Invalid attribute '{}'".format(attr_name)
+                    f"COPT_PULP: Invalid attribute '{attr_name}'"
                 )
 
             return retval

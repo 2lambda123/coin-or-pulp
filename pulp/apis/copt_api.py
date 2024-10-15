@@ -718,9 +718,7 @@ class COPT_DLL(LpSolver):
                 raise PulpSolverError("COPT_PULP: Unsupported file type")
 
             if rc != 0:
-                raise PulpSolverError(
-                    f"COPT_PULP: Failed to write file '{filename}'"
-                )
+                raise PulpSolverError(f"COPT_PULP: Failed to write file '{filename}'")
 
         def setParam(self, name, val):
             """
@@ -752,9 +750,7 @@ class COPT_DLL(LpSolver):
                         )
                     )
             else:
-                raise PulpSolverError(
-                    f"COPT_PULP: Invalid parameter '{par_name}'"
-                )
+                raise PulpSolverError(f"COPT_PULP: Invalid parameter '{par_name}'")
 
         def getParam(self, name):
             """
@@ -792,9 +788,7 @@ class COPT_DLL(LpSolver):
                 else:
                     retval = par_intval.value
             else:
-                raise PulpSolverError(
-                    f"COPT_PULP: Invalid parameter '{par_name}'"
-                )
+                raise PulpSolverError(f"COPT_PULP: Invalid parameter '{par_name}'")
 
             return retval
 
@@ -835,9 +829,7 @@ class COPT_DLL(LpSolver):
                 else:
                     retval = attr_intval.value
             else:
-                raise PulpSolverError(
-                    f"COPT_PULP: Invalid attribute '{attr_name}'"
-                )
+                raise PulpSolverError(f"COPT_PULP: Invalid attribute '{attr_name}'")
 
             return retval
 
